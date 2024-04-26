@@ -1,0 +1,30 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             version="2.0">
+
+    <persistence-unit name="jpa-hibernate-persistence-unit" transaction-type="RESOURCE_LOCAL">
+        <description>Persistence unit for the JPA Hibernate</description>
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>org.jhd.entity.Product</class>
+
+        <properties>
+            <!-- Database connection settings -->
+            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://host.docker.internal:3307/jpahd" />
+            <property name="jakarta.persistence.jdbc.user" value="root" />
+            <property name="jakarta.persistence.jdbc.password" value="password" />
+            <!-- Automatically export the schema -->
+            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create" />
+            <!-- Echo all executed SQL to console -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />
+            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.bhm2ddl.auto" value="create"/>
+            <property name="hibernate.format_sql" value="true" />
+            <property name="hibernate.highlight_sql" value="true" />
+        </properties>
+
+    </persistence-unit>
+
+</persistence>
