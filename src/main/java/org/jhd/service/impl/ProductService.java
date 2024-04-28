@@ -10,7 +10,7 @@ import org.jhd.service.Service;
 import java.util.List;
 import java.util.Optional;
 
-public class ProductService implements Service<Product> {
+public class ProductService implements Service<Product, ProductDto> {
     private Dao<Product, ProductDto> productDao;
 
     public ProductService(EntityManagerFactory entityManagerFactory) {

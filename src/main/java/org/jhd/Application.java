@@ -28,7 +28,7 @@ public class Application {
 
         try {
             //create service
-            Service<Product> productService = new ProductService(emf);
+            Service<Product, ProductDto> productService = new ProductService(emf);
 
             //create product
             Product product1 = new Product();
