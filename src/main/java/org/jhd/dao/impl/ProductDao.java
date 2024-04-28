@@ -191,6 +191,7 @@ public class ProductDao implements Dao<Product, ProductDto> {
     //EntityManager per transaction
     //centralise boilerplate code
     private void executeInsideTransaction(Consumer<EntityManager> operation) {
+        //context is empty
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
@@ -245,6 +246,7 @@ public class ProductDao implements Dao<Product, ProductDto> {
     }
     //EntityManager per class
     private void executeInsideTransactionEMPerClass(Consumer<EntityManager> action) {
+        //context already exists
         EntityTransaction tx = emPerClass.getTransaction();
         try {
             tx.begin();

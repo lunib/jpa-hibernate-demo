@@ -16,9 +16,15 @@ import java.util.Properties;
 //It’s not suitable for use cases where it’s necessary to test in isolation the application components that use
 //different persistence units class representing persistence.xml
 public class CustomPersistenceUnitInfo implements PersistenceUnitInfo {
+    private final String persistentUnitName;
+
+    public CustomPersistenceUnitInfo(String persistentUnitName) {
+        this.persistentUnitName = persistentUnitName;
+    }
+
     @Override
     public String getPersistenceUnitName() {
-        return "jpa-hibernate-persistence-unit";
+        return persistentUnitName;
     }
 
     @Override
