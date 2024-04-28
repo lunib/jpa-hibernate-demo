@@ -2,7 +2,6 @@ package org.jhd.dao.impl;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
-import jakarta.transaction.Transactional;
 import junit.framework.TestCase;
 import org.jhd.dao.Dao;
 import org.jhd.dto.ProductDto;
@@ -132,24 +131,36 @@ public class ProductDaoTest extends TestCase {
     }
 
     @Test
-//    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
     public void testDelete() {
         //create product
         Product product = new Product();
         product.setName("Milk");
         product.setPrice(2.37);
         //save product
+        productDao.save(product);
 
-        //as save and delete use separate EntityManger, the 'product' entity after the
-        //save() method is in detached state so inside delete() method we need to first
+        //as save and delete use separate EntityManger, the 'product' entity is in
+        //detached state at this point so inside delete() method we need to first
         //persist that entity by getting it from db and then remove it
-//        productDao.save(product);
-//        productDao.delete(product);
+        productDao.delete(product);
+
+        Product deletedProduct =productDao.get(product.getId()).orElse(null);
+        assertNull(deletedProduct);
+    }
+
+    @Test
+//    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    public void testDeleteEMPerClass() {
+        //create product
+        Product product = new Product();
+        product.setName("Milk");
+        product.setPrice(2.37);
+        //save product
+        productDao.saveEMPerClass(product);
 
         //saveEMPerClass and deleteEMPerClass both use the same EntityManager instance hence
         //the 'product' entity passed to entityManager.remove(product) is not detached so
         //we can simply remove it without getting it from db
-        productDao.saveEMPerClass(product);
         productDao.deleteEMPerClass(product);
 
         Product deletedProduct =productDao.get(product.getId()).orElse(null);
