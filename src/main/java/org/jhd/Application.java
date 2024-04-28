@@ -5,42 +5,59 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
 import org.hibernate.jpa.HibernatePersistenceProvider;
+import org.jhd.dto.ProductDto;
 import org.jhd.entity.Product;
+import org.jhd.exception.ResourceNotFoundException;
 import org.jhd.persistence.CustomPersistenceUnitInfo;
+import org.jhd.service.Service;
+import org.jhd.service.impl.ProductService;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 public class Application {
     public static void main(String[] args) {
         //Use persistence.xml
-        //EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-hibernate-persistence-unit");
-        //Use PersistenceUnitInfo - create persistence unit detail programmatically
-        EntityManagerFactory emf = new HibernatePersistenceProvider()
-                .createContainerEntityManagerFactory(new CustomPersistenceUnitInfo(), new HashMap());
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-hibernate-persistence-unit");
 
-        EntityManager em = emf.createEntityManager(); //represents the context
+        //TODO - set show SQL and create table configurations
+        //Use PersistenceUnitInfo class - create persistence unit detail programmatically
+//        EntityManagerFactory emf = new HibernatePersistenceProvider()
+//                .createContainerEntityManagerFactory(new CustomPersistenceUnitInfo(), new HashMap());
+
         try {
-            EntityTransaction transaction = em.getTransaction();
-            boolean success = false;
-            transaction.begin();
-            try {
-//                Product product = new Product();
-//                product.setName("Biscuit");
-//                em.persist(product); //adds the instance of entity to context - NOT AN INSERT QUERY//read
+            //create service
+            Service<Product> productService = new ProductService(emf);
 
-                Product product1 = em.find(Product.class, 1l);
-                System.out.println("before update" + product1);
-                product1.setName("Cake");
-                success = true;
-            } finally {
-                if(success) {
-                    transaction.commit(); //at this point decides whether to send INSERT query or not
-                } else {
-                    transaction.rollback();
-                }
-            }
+            //create product
+            Product product1 = new Product();
+            product1.setName("Biscuit");
+            product1.setPrice(8.37);
+            productService.save(product1);
+
+            Product product2 = new Product();
+            product2.setName("Shoes");
+            product2.setPrice(49.99);
+            productService.save(product2);
+
+            Product product3 = new Product();
+            product3.setName("Kettle");
+            product3.setPrice(35.0);
+            productService.save(product3);
+
+            List<Product> products = productService.getAll();
+            products.forEach(System.out::println);
+
+            ProductDto productDto1 = new ProductDto("cake", 10.50);
+            productService.updateWithGetPersistent(product1, productDto1);
+
+            ProductDto productDto2 = new ProductDto("boots", 85.99);
+            productService.updateWithMergeDetached(product2, productDto2);
+
+            productService.delete(product3);
         } finally {
-            em.close();
+            emf.close();
         }
     }
 }

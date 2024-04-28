@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 
 //https://www.youtube.com/watch?v=UVo2SRR-ZRM - MariaDB
-public class Main {
+public class ProgrammingLanguageApplication {
     private static JpaService jpaService = JpaService.getInstance();
     public static void main(String[] args) {
         try {

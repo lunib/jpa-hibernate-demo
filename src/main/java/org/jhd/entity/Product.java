@@ -15,6 +15,9 @@ public class Product {
     @Column(name = "product_name")
     private String name;
 
+    @Column(name = "product_price")
+    private Double price;
+
     public Product() {
     }
 
@@ -39,11 +42,20 @@ public class Product {
         this.name = name;
     }
 
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", price=" + price +
                 '}';
     }
 

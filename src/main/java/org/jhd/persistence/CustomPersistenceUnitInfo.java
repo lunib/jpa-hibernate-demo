@@ -11,8 +11,10 @@ import javax.sql.DataSource;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
-
-//class representing persistence.xml
+//We can bootstrap a JPA implementation without using the “persistence.xml” file, by just using plain Java. This
+//class is a plain data container, which stores the configuration parameters bound to a specific persistence unit.
+//It’s not suitable for use cases where it’s necessary to test in isolation the application components that use
+//different persistence units class representing persistence.xml
 public class CustomPersistenceUnitInfo implements PersistenceUnitInfo {
     @Override
     public String getPersistenceUnitName() {
