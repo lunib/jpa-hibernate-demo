@@ -3,26 +3,43 @@ package org.jhd.dao.impl;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import junit.framework.TestCase;
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.jhd.dao.Dao;
 import org.jhd.dto.ProductDto;
 import org.jhd.entity.Product;
+import org.jhd.persistence.CustomPersistenceUnitInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RunWith(JUnit4.class)
 public class ProductDaoTest extends TestCase {
-    //Use persistence.xml
     private static EntityManagerFactory emf;
     private Dao<Product, ProductDto> productDao;
 
     @Before
     public void init() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-hibernate-persistence-unit");;
+        //Use persistence.xml
+        String persistenceUnitName = "jpa-hibernate-persistence-unit";
+        Map<String, String> props = new HashMap<>();
+        props.put("hibernate.bhm2ddl.auto", "create"); //in production value should be 'none'
+        props.put("hibernate.show_sql", "true");
+        props.put("hibernate.format_sql", "true");
+        props.put("hibernate.highlight_sql", "true");
+        props.put("jakarta.persistence.schema-generation.database.action", "drop-and-create");
+
+        //Use persistence.xml
+//        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName);
+        //Use PersistenceUnitInfo class - create persistence unit detail programmatically
+        EntityManagerFactory emf = new HibernatePersistenceProvider()
+                .createContainerEntityManagerFactory(new CustomPersistenceUnitInfo(persistenceUnitName), props);
+
         productDao = new ProductDao(emf);
     }
 
