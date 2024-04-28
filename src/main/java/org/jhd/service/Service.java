@@ -6,16 +6,16 @@ import org.jhd.entity.Product;
 import java.util.List;
 import java.util.Optional;
 
-public interface Service<T> {
+public interface Service<T, V> {
     Optional<T> get(Long id);
 
     List<T> getAll();
 
     void save(T t);
 
-    Product updateWithMergeDetached(Product product, ProductDto productDto);
+    T updateWithMergeDetached(T t, V v);
 
-    Product updateWithGetPersistent(Product product, ProductDto productDto);
+    T updateWithGetPersistent(T t, V v);
 
-    void delete(Product product);
+    void delete(T t);
 }

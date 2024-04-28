@@ -1,21 +1,20 @@
 package org.jhd.dao;
 
 import org.jhd.dto.ProductDto;
-import org.jhd.entity.Product;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface Dao<T> {
+public interface Dao<T, V> {
     Optional<T> get(long id);
 
     List<T> getAll();
 
     void save(T t);
 
-    T updateWithMergeDetached(T t, ProductDto productDto);
+    T updateWithMergeDetached(T t, V v);
 
-    T updateWithGetPersistent(T t, ProductDto productDto);
+    T updateWithGetPersistent(T t, V v);
 
     void delete(T t);
 
