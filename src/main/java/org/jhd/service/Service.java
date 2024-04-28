@@ -13,9 +13,9 @@ public interface Service<T> {
 
     void save(T t);
 
-    Product updateWithMergeDetached(Product product, ProductDto productDto);
+    T updateWithMergeDetached(T t, ProductDto productDto);
 
-    Product updateWithGetPersistent(Product product, ProductDto productDto);
+    T updateWithGetPersistent(T t, ProductDto productDto);
 
-    void delete(Product product);
+    void delete(T t);
 }
