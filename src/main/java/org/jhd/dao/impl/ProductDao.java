@@ -3,7 +3,6 @@ package org.jhd.dao.impl;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
-import jakarta.transaction.Transactional;
 import org.jhd.dao.Dao;
 import org.jhd.dto.ProductDto;
 import org.jhd.entity.Product;
@@ -21,7 +20,7 @@ import java.util.function.Function;
 
 //@Transactional only works when we call the method throw proxy
 //@Transactional
-public class ProductDao implements Dao<Product> {
+public class ProductDao implements Dao<Product, ProductDto> {
     private EntityManagerFactory emf;
 
     //an EntityManager contains a persistence context, that will track everything it reads from/writes to db.

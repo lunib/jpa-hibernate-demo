@@ -18,7 +18,7 @@ import java.util.List;
 public class ProductDaoTest extends TestCase {
     //Use persistence.xml
     private static EntityManagerFactory emf;
-    private Dao<Product> productDao;
+    private Dao<Product, ProductDto> productDao;
 
     @Before
     public void init() {
