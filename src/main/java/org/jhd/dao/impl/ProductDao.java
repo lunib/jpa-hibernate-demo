@@ -21,7 +21,7 @@ import java.util.function.Function;
 //@Transactional only works when we call the method throw proxy
 //@Transactional
 public class ProductDao implements Dao<Product, ProductDto> {
-    private EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
 
     //an EntityManager contains a persistence context, that will track everything it reads from/writes to db.
     //EntityManager per transaction - to avoid bloated memory, we should use a new one per transaction
@@ -30,7 +30,7 @@ public class ProductDao implements Dao<Product, ProductDto> {
     //different objects back
 
     //EntityManager per class - not needed for rest of the methods
-    private EntityManager emPerClass;
+    private final EntityManager emPerClass;
 
     public ProductDao(EntityManagerFactory entityManagerFactory) {
         this.emf = entityManagerFactory;
@@ -53,13 +53,13 @@ public class ProductDao implements Dao<Product, ProductDto> {
     @Override
     public void save(Product product) {
 //        EntityManager em = emf.createEntityManager();
-//        EntityTransaction transaction = em.getTransaction();
+//        EntityTransaction tx = em.getTransaction();
 //        try {
-//            transaction.begin();
+//            tx.begin();
 //            em.persist(product); //adds the instance of entity to context - NOT AN INSERT QUERY//read
-//            transaction.commit(); //at this point decides whether to send INSERT query or not
+//            tx.commit(); //at this point decides whether to send INSERT query or not
 //        } catch(RuntimeException e) {
-//            transaction.rollback();
+//            tx.rollback();
 //            throw e;
 //        } finally {
 //            em.close();
@@ -78,9 +78,9 @@ public class ProductDao implements Dao<Product, ProductDto> {
 //    public Product updateWithMergeDetached(Product detachedProduct, ProductDto productDto) {
 //        //EntityManager per transaction
 //        EntityManager em = emf.createEntityManager();
-//        EntityTransaction transaction = em.getTransaction();
+//        EntityTransaction tx = em.getTransaction();
 //        try {
-//            transaction.begin();
+//            tx.begin();
 //            //invoking em.merge(user) before setters or after setters doesn't matter. The persistent entity
 //            //will be updated when method invocation finishes - both #1 and #2 produce same result
 //            //#1
@@ -97,10 +97,10 @@ public class ProductDao implements Dao<Product, ProductDto> {
 //            //entityManager.flush();
 //
 //            //commit - changes are made into the database & transaction ends there
-//            transaction.commit();
+//            tx.commit();
 //            return persistentProduct;
 //        } catch(RuntimeException e) {
-//            transaction.rollback();
+//            tx.rollback();
 //            throw e;
 //        } finally {
 //            em.close();
@@ -108,7 +108,7 @@ public class ProductDao implements Dao<Product, ProductDto> {
 //    }
     @Override
     public Product updateWithMergeDetached(Product detachedProduct, ProductDto productDto) {
-        Product updatedProduct = executeInsideTransactionWithFn(em -> {
+        return executeInsideTransactionWithFn(em -> {
             //invoking em.merge(user) before setters or after setters doesn't matter. The persistent entity
             //will be updated when method invocation finishes - both #1 and #2 produce same result
             //#1
@@ -122,7 +122,6 @@ public class ProductDao implements Dao<Product, ProductDto> {
 
             return persistentProduct;
         });
-        return updatedProduct;
     }
 
     //We can fetch and modify our objects in the same transaction (i.e. with the same entityManager)
@@ -131,35 +130,34 @@ public class ProductDao implements Dao<Product, ProductDto> {
     @Override
     public Product updateWithGetPersistent(Product detachedProduct, ProductDto productDto) {
 //        EntityManager em = emf.createEntityManager();
-//        EntityTransaction transaction = em.getTransaction();
+//        EntityTransaction tx = em.getTransaction();
 //        //update the persistent entity
 //        try {
-//            transaction.begin();
+//            tx.begin();
 //            persistentProduct.setName(productDto.name());
 //            persistentProduct.setPrice(productDto.price());
-//            transaction.commit();
+//            tx.commit();
 //            return persistentProduct;
 //        } catch(RuntimeException e) {
-//            transaction.rollback();
+//            tx.rollback();
 //            throw e;
 //        } finally {
 //            em.close();
 //        }
-        Product updatedProduct = executeInsideTransactionWithFn(em -> {
+        return executeInsideTransactionWithFn(em -> {
             //first get the persistent entity with the same id as the detached one
             Product persistentProduct = em.find(Product.class, detachedProduct.getId());
             persistentProduct.setName(productDto.name());
             persistentProduct.setPrice(productDto.price());
             return persistentProduct;
         });
-        return updatedProduct;
     }
 
 //    @Override
 //    public void delete(Product detachedProduct) {
 //        //EntityManager per transaction
 //        EntityManager em = emf.createEntityManager();
-//        EntityTransaction transaction = em.getTransaction();
+//        EntityTransaction tx = em.getTransaction();
 //
 //        //first get the persistent entity product with same id as the detached product
 //        //passed in the argument
@@ -167,11 +165,11 @@ public class ProductDao implements Dao<Product, ProductDto> {
 //
 //        //delete the product
 //        try {
-//            transaction.begin();
+//            tx.begin();
 //            em.remove(persistentProduct); //removes the instance of entity from context
-//            transaction.commit();
+//            tx.commit();
 //        } catch(RuntimeException e) {
-//            transaction.rollback();
+//            tx.rollback();
 //            throw e;
 //        } finally {
 //            em.close();
@@ -194,7 +192,8 @@ public class ProductDao implements Dao<Product, ProductDto> {
         //context is empty
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-        try {
+        //try-with-resource block - no need to have finally block to close em
+        try (em) {
             tx.begin();
             operation.accept(em);
             //flush - changes are reflected in database after encountering flush but the transaction
@@ -202,48 +201,30 @@ public class ProductDao implements Dao<Product, ProductDto> {
             //entityManager.flush();
             //commit - changes are made into the database & transaction ends there
             tx.commit();
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             tx.rollback();
             throw e;
-        } finally {
-            em.close();
         }
     }
 
     //EntityManager per transaction
     private <R> R executeInsideTransactionWithFn(Function<EntityManager, R> operation) {
+        //context is empty
         EntityManager em = emf.createEntityManager();
         EntityTransaction tx = em.getTransaction();
-        try {
+        try (em) {
             tx.begin();
             R returnValue = operation.apply(em);
             tx.commit();
             return returnValue;
-        } catch(RuntimeException e) {
+        } catch (RuntimeException e) {
             tx.rollback();
             throw e;
-        } finally {
-            em.close();
         }
     }
 
 
 
-    //EntityManager per class
-    @Override
-//    @Transactional(value = Transactional.TxType.SUPPORTS)
-    public void deleteEMPerClass(Product product) {
-        executeInsideTransactionEMPerClass(em -> {
-            em.remove(product);
-        });
-    }
-    //EntityManager per class
-    @Override
-    public void saveEMPerClass(Product product) {
-        executeInsideTransactionEMPerClass(em -> {
-            em.persist(product);
-        });
-    }
     //EntityManager per class
     private void executeInsideTransactionEMPerClass(Consumer<EntityManager> action) {
         //context already exists
@@ -256,5 +237,14 @@ public class ProductDao implements Dao<Product, ProductDto> {
             tx.rollback();
             throw e;
         }
+    }    @Override
+//    @Transactional(value = Transactional.TxType.SUPPORTS)
+    public void deleteEMPerClass(Product product) {
+        executeInsideTransactionEMPerClass(em -> em.remove(product));
+    }
+    //EntityManager per class
+    @Override
+    public void saveEMPerClass(Product product) {
+        executeInsideTransactionEMPerClass(em -> em.persist(product));
     }
 }
