@@ -9,7 +9,7 @@ import java.util.List;
 
 //https://www.youtube.com/watch?v=UVo2SRR-ZRM - MariaDB
 public class ProgrammingLanguageApplication {
-    private static JpaService jpaService = JpaService.getInstance();
+    private static final JpaService jpaService = JpaService.getInstance();
     public static void main(String[] args) {
         try {
             //*****************************************************************************************
@@ -50,7 +50,8 @@ public class ProgrammingLanguageApplication {
         jpaService.runInTransaction(entityManager -> {
             Arrays.stream("Java,JavaScript,C++,C#,Python,Go,Rust,PHP".split(","))
                     .map(name -> new ProgrammingLanguage(name, (int) (Math.random() * 10)))
-                    .forEach(pl -> entityManager.persist(pl));
+                    //.forEach(pl -> entityManager.persist(pl));
+                    .forEach(entityManager::persist);
             return null;
         });
     }

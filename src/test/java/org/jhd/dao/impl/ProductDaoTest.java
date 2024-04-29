@@ -26,19 +26,18 @@ public class ProductDaoTest extends TestCase {
     @Before
     public void init() {
         //Use persistence.xml
-        String persistenceUnitName = "jpa-hibernate-persistence-unit";
-        Map<String, String> props = new HashMap<>();
-        props.put("hibernate.bhm2ddl.auto", "create"); //in production value should be 'none'
-        props.put("hibernate.show_sql", "true");
-        props.put("hibernate.format_sql", "true");
-        props.put("hibernate.highlight_sql", "true");
-        props.put("jakarta.persistence.schema-generation.database.action", "drop-and-create");
+        emf = Persistence.createEntityManagerFactory("jpa-hibernate-persistence-unit-h2-test");
 
-        //Use persistence.xml
-//        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName);
         //Use PersistenceUnitInfo class - create persistence unit detail programmatically
-        EntityManagerFactory emf = new HibernatePersistenceProvider()
-                .createContainerEntityManagerFactory(new CustomPersistenceUnitInfo(persistenceUnitName), props);
+//        String persistenceUnitName = "jpa-hibernate-persistence-unit-h2-test";
+//        Map<String, String> props = new HashMap<>();
+//        props.put("hibernate.hbm2ddl.auto", "create"); //in production value should be 'none'
+//        props.put("hibernate.show_sql", "true");
+//        props.put("hibernate.format_sql", "true");
+//        props.put("hibernate.highlight_sql", "true");
+//        props.put("jakarta.persistence.schema-generation.database.action", "drop-and-create");
+//        emf = new HibernatePersistenceProvider()
+//                .createContainerEntityManagerFactory(new CustomPersistenceUnitInfo(persistenceUnitName), props);
 
         productDao = new ProductDao(emf);
     }
@@ -87,7 +86,7 @@ public class ProductDaoTest extends TestCase {
         //get all products
         List<Product> products = productDao.getAll();
         products.forEach(System.out::println);
-        assertEquals(products.size(), 3);
+        assertEquals(3, products.size());
     }
 
     @Test
