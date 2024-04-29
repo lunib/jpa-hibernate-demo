@@ -1,13 +1,9 @@
 package org.jhd;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.jhd.dto.ProductDto;
 import org.jhd.entity.Product;
-import org.jhd.exception.ResourceNotFoundException;
 import org.jhd.persistence.CustomPersistenceUnitInfo;
 import org.jhd.service.Service;
 import org.jhd.service.impl.ProductService;
@@ -15,7 +11,6 @@ import org.jhd.service.impl.ProductService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class Application {
     public static void main(String[] args) {

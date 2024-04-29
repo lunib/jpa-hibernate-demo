@@ -1,7 +1,6 @@
 package org.jhd.dao.impl;
 
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import junit.framework.TestCase;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.jhd.dao.Dao;
@@ -35,11 +34,11 @@ public class ProductDaoTest extends TestCase {
         props.put("jakarta.persistence.schema-generation.database.action", "drop-and-create");
 
         //Use persistence.xml
-//        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName);
-        //Use PersistenceUnitInfo class - create persistence unit detail programmatically
-        EntityManagerFactory emf = new HibernatePersistenceProvider()
-                .createContainerEntityManagerFactory(new CustomPersistenceUnitInfo(persistenceUnitName), props);
+        //emf = Persistence.createEntityManagerFactory(persistenceUnitName);
 
+        //Use PersistenceUnitInfo class - create persistence unit detail programmatically
+        emf = new HibernatePersistenceProvider()
+                .createContainerEntityManagerFactory(new CustomPersistenceUnitInfo(persistenceUnitName), props);
         productDao = new ProductDao(emf);
     }
 
