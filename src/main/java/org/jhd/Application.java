@@ -1,6 +1,7 @@
 package org.jhd;
 
 import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.jhd.dto.ProductDto;
 import org.jhd.entity.Product;
@@ -14,17 +15,17 @@ import java.util.Map;
 
 public class Application {
     public static void main(String[] args) {
+        //Use persistence.xml
+//        EntityManagerFactory emf = Persistence.createEntityManagerFactory("jpa-hibernate-persistence-unit");
+
+        //Use PersistenceUnitInfo class - create persistence unit detail programmatically
         String persistenceUnitName = "jpa-hibernate-persistence-unit";
         Map<String, String> props = new HashMap<>();
-        props.put("hibernate.bhm2ddl.auto", "create"); //in production value should be 'none'
+        props.put("hibernate.hbm2ddl.auto", "create"); //in production value should be 'none'
         props.put("hibernate.show_sql", "true");
         props.put("hibernate.format_sql", "true");
         props.put("hibernate.highlight_sql", "true");
         props.put("jakarta.persistence.schema-generation.database.action", "drop-and-create");
-
-        //Use persistence.xml
-//        EntityManagerFactory emf = Persistence.createEntityManagerFactory(persistenceUnitName);
-        //Use PersistenceUnitInfo class - create persistence unit detail programmatically
         EntityManagerFactory emf = new HibernatePersistenceProvider()
                 .createContainerEntityManagerFactory(new CustomPersistenceUnitInfo(persistenceUnitName), props);
 
@@ -57,7 +58,7 @@ public class Application {
             ProductDto productDto2 = new ProductDto("boots", 85.99);
             productService.updateWithMergeDetached(product2, productDto2);
 
-            productService.delete(product3);
+//            productService.delete(product3);
         } finally {
             emf.close();
         }
