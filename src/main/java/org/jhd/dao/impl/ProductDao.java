@@ -180,8 +180,19 @@ public class ProductDao implements Dao<Product, ProductDto> {
     public void delete(Product detachedProduct) {
         executeInsideTransaction(entityManager -> {
             //first get the persistent entity product with same id as the detached product
-            //passed in the argument
-            Product persistentProduct = entityManager.find(Product.class, detachedProduct.getId());
+            //passed in the argument and then remove it
+
+            //https://stackoverflow.com/questions/1607532/when-to-use-entitymanager-find-vs-entitymanager-getreference-with-jpa
+
+            //issues a SELECT query to get the actual object from db - not necessary in this scenario
+            //Product persistentProduct = entityManager.find(Product.class, detachedProduct.getId());
+
+            //does not issue a SELECT query to get the actual object from db, only gets a proxy object
+            //with the PK initialised. This is enough in this scenario as we won't be accessing the fields
+            //of the object (which is issue a SELECT query to load the properties of the object), we are
+            //just removing it so just the proxy object containing the PK reference is enough
+            Product persistentProduct = entityManager.getReference(Product.class, detachedProduct.getId());
+
             entityManager.remove(persistentProduct);
         });
     }
